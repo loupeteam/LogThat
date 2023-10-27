@@ -1,13 +1,11 @@
-/********************************************************************
- * COPYRIGHT --  
- ********************************************************************
- * Library: LogThat
+/*
  * File: logStateChange.c
- * Author: ScismD, sClaiborne
- * Created: June 10, 2016
- ********************************************************************
- * Implementation of library LogThat
- ********************************************************************/
+ * Copyright (c) 2023 Loupe
+ * https://loupe.team
+ * 
+ * This file is part of LogThat, licensed under the MIT License.
+ * 
+ */
 
 #include <bur/plctypes.h>
 #ifdef __cplusplus
