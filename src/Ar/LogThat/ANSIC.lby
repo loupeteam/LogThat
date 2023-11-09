@@ -14,8 +14,6 @@
     <File>logStateChange.c</File>
     <File>LogInternalWrite.h</File>
     <File>LogInternalWrite.c</File>
-    <File>README.md</File>
-    <File>LICENSE.md</File>
   </Files>
   <Dependencies>
     <Dependency ObjectName="ArEventLog" />
