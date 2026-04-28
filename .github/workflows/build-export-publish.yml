@@ -20,8 +20,6 @@ jobs:
 
     env:
       PROJECT:     example/AsProject/AsProject.apj
-      PROJECT_DIR: example/AsProject
-      LIBRARY:     ANSIC
       LIBRARY_DIR: src/Ar/LogThat
       EXPORT_DIR:  export
 
@@ -52,6 +50,22 @@ jobs:
         uses: loupeteam/br-actions/find-as6-build@v1
         id: find-as
 
+      - name: Resolve project paths
+        id: project
+        shell: pwsh
+        run: |
+          $apj = "${{ env.PROJECT }}"
+          if (-not (Test-Path $apj)) { Write-Error "Project file not found: $apj"; exit 1 }
+          $dir = Split-Path $apj -Parent
+          "dir=$dir" | Out-File -Append -Encoding utf8 -FilePath $env:GITHUB_OUTPUT
+
+          $libDir = "${{ env.LIBRARY_DIR }}"
+          $lby = Get-ChildItem -Path $libDir -Filter *.lby -File |
+                   Select-Object -First 1
+          if (-not $lby) { Write-Error "No .lby file found in: $libDir"; exit 1 }
+          $libName = [System.IO.Path]::GetFileNameWithoutExtension($lby.Name)
+          "library=$libName" | Out-File -Append -Encoding utf8 -FilePath $env:GITHUB_OUTPUT
+
       - name: Build Intel
         uses: loupeteam/br-actions/build-as-project@v1
         with:
@@ -69,8 +83,8 @@ jobs:
       - name: Export library
         uses: loupeteam/br-actions/export-as-library@v1
         with:
-          project-dir: ${{ env.PROJECT_DIR }}
-          library:     ${{ env.LIBRARY }}
+          project-dir: ${{ steps.project.outputs.dir }}
+          library:     ${{ steps.project.outputs.library }}
           library-dir: ${{ env.LIBRARY_DIR }}
           configs:     Intel ARM
           output:      ${{ env.EXPORT_DIR }}
@@ -80,7 +94,7 @@ jobs:
         id: export-dir
         shell: pwsh
         run: |
-          $path = Get-ChildItem "$env:EXPORT_DIR/$env:LIBRARY" -Directory |
+          $path = Get-ChildItem "$env:EXPORT_DIR/${{ steps.project.outputs.library }}" -Directory |
                   Select-Object -First 1 -ExpandProperty FullName
           "path=$path" | Out-File -Append -Encoding utf8 -FilePath $env:GITHUB_OUTPUT
 
@@ -108,6 +122,6 @@ jobs:
       - name: Upload exported library artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.LIBRARY }}-${{ steps.version.outputs.version }}
-          path: ${{ env.EXPORT_DIR }}/${{ env.LIBRARY }}/
+          name: ${{ steps.project.outputs.library }}-${{ steps.version.outputs.version }}
+          path: ${{ env.EXPORT_DIR }}/${{ steps.project.outputs.library }}/
           if-no-files-found: error

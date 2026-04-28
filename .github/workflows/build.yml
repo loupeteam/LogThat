@@ -40,6 +40,15 @@ jobs:
         uses: loupeteam/br-actions/find-as6-build@v1
         id: find-as
 
+      - name: Resolve project paths
+        id: project
+        shell: pwsh
+        run: |
+          $apj = "${{ env.PROJECT }}"
+          if (-not (Test-Path $apj)) { Write-Error "Project file not found: $apj"; exit 1 }
+          $dir = Split-Path $apj -Parent
+          "dir=$dir" | Out-File -Append -Encoding utf8 -FilePath $env:GITHUB_OUTPUT
+
       - name: Build Intel
         uses: loupeteam/br-actions/build-as-project@v1
         with:
@@ -61,5 +70,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: BuildDiagnostics
-          path: example/AsProject/Temp/BuildDiagnostics.log
+          path: ${{ steps.project.outputs.dir }}/Temp/BuildDiagnostics.log
           if-no-files-found: ignore
