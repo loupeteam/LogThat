@@ -15,6 +15,187 @@ extern "C"
 #ifndef _BUR_PUBLIC
 #define _BUR_PUBLIC
 #endif
+/* Datatypes and datatypes of function blocks */
+typedef struct dbConnect
+{
+	/* VAR_INPUT (analog) */
+	unsigned long pServerName;
+	unsigned long pUserName;
+	unsigned long pPassword;
+	unsigned long pDatabaseName;
+	unsigned long databaseSystem;
+	/* VAR_OUTPUT (analog) */
+	unsigned short status;
+	signed short dbError;
+	unsigned long connectionIdent;
+	/* VAR (analog) */
+	unsigned short _statemachine;
+	unsigned short _result;
+	/* VAR_INPUT (digital) */
+	plcbit enable;
+} dbConnect_typ;
+
+typedef struct dbConnectEnc
+{
+	/* VAR_INPUT (analog) */
+	unsigned long pServerName;
+	unsigned long pUserName;
+	unsigned long pPassword;
+	unsigned long pDatabaseName;
+	unsigned long databaseSystem;
+	unsigned long pEncoding;
+	/* VAR_OUTPUT (analog) */
+	unsigned short status;
+	signed short dbError;
+	unsigned long connectionIdent;
+	/* VAR (analog) */
+	unsigned short _statemachine;
+	unsigned short _result;
+	/* VAR_INPUT (digital) */
+	plcbit enable;
+} dbConnectEnc_typ;
+
+typedef struct dbExecuteSql
+{
+	/* VAR_INPUT (analog) */
+	unsigned long connectionIdent;
+	unsigned long pSqlStatement;
+	/* VAR_OUTPUT (analog) */
+	unsigned short status;
+	signed short dbError;
+	/* VAR (analog) */
+	unsigned short _statemachine;
+	unsigned short _result;
+	/* VAR_INPUT (digital) */
+	plcbit enable;
+} dbExecuteSql_typ;
+
+typedef struct dbGetAffectedRows
+{
+	/* VAR_INPUT (analog) */
+	unsigned long connectionIdent;
+	/* VAR_OUTPUT (analog) */
+	unsigned short status;
+	signed short dbError;
+	unsigned long affectedRows;
+	/* VAR (analog) */
+	unsigned short _statemachine;
+	unsigned short _result;
+	/* VAR_INPUT (digital) */
+	plcbit enable;
+} dbGetAffectedRows_typ;
+
+typedef struct dbGetColumnCount
+{
+	/* VAR_INPUT (analog) */
+	unsigned long connectionIdent;
+	/* VAR_OUTPUT (analog) */
+	unsigned short status;
+	signed short dbError;
+	signed short columnCount;
+	/* VAR (analog) */
+	unsigned short _statemachine;
+	unsigned short _result;
+	/* VAR_INPUT (digital) */
+	plcbit enable;
+} dbGetColumnCount_typ;
+
+typedef struct dbFetchNextRow
+{
+	/* VAR_INPUT (analog) */
+	unsigned long connectionIdent;
+	/* VAR_OUTPUT (analog) */
+	unsigned short status;
+	signed short dbError;
+	/* VAR (analog) */
+	unsigned short _statemachine;
+	unsigned short _result;
+	/* VAR_INPUT (digital) */
+	plcbit enable;
+} dbFetchNextRow_typ;
+
+typedef struct dbGetData
+{
+	/* VAR_INPUT (analog) */
+	unsigned long connectionIdent;
+	unsigned long columnIdx;
+	signed short dataType;
+	unsigned long pData;
+	unsigned long dataSize;
+	/* VAR_OUTPUT (analog) */
+	unsigned short status;
+	signed short dbError;
+	unsigned long actDataSize;
+	/* VAR_INPUT (digital) */
+	plcbit enable;
+} dbGetData_typ;
+
+typedef struct dbDisconnect
+{
+	/* VAR_INPUT (analog) */
+	unsigned long connectionIdent;
+	/* VAR_OUTPUT (analog) */
+	unsigned short status;
+	signed short dbError;
+	/* VAR (analog) */
+	unsigned short _statemachine;
+	unsigned short _result;
+	/* VAR_INPUT (digital) */
+	plcbit enable;
+} dbDisconnect_typ;
+
+typedef struct dbGetInfo
+{
+	/* VAR_INPUT (analog) */
+	unsigned long connectionIdent;
+	unsigned short infoType;
+	unsigned long pServerInfo;
+	unsigned long serverInfoSize;
+	/* VAR_OUTPUT (analog) */
+	unsigned short status;
+	signed short dbError;
+	unsigned short actServerInfoSize;
+	/* VAR (analog) */
+	unsigned short _statemachine;
+	unsigned short _result;
+	/* VAR_INPUT (digital) */
+	plcbit enable;
+} dbGetInfo_typ;
+
+typedef struct dbGetErrorMessage
+{
+	/* VAR_INPUT (analog) */
+	unsigned long connectionIdent;
+	unsigned long pErrorMessage;
+	unsigned long errorMessageSize;
+	/* VAR_OUTPUT (analog) */
+	unsigned short status;
+	signed short dbError;
+	unsigned char sqlState[6];
+	signed long nativeError;
+	signed short actErrorMessageSize;
+	/* VAR (analog) */
+	unsigned short _statemachine;
+	unsigned short _result;
+	/* VAR_INPUT (digital) */
+	plcbit enable;
+} dbGetErrorMessage_typ;
+
+
+
+/* Prototyping of functions and function blocks */
+_BUR_PUBLIC void dbConnect(struct dbConnect* inst);
+_BUR_PUBLIC void dbConnectEnc(struct dbConnectEnc* inst);
+_BUR_PUBLIC void dbExecuteSql(struct dbExecuteSql* inst);
+_BUR_PUBLIC void dbGetAffectedRows(struct dbGetAffectedRows* inst);
+_BUR_PUBLIC void dbGetColumnCount(struct dbGetColumnCount* inst);
+_BUR_PUBLIC void dbFetchNextRow(struct dbFetchNextRow* inst);
+_BUR_PUBLIC void dbGetData(struct dbGetData* inst);
+_BUR_PUBLIC void dbDisconnect(struct dbDisconnect* inst);
+_BUR_PUBLIC void dbGetInfo(struct dbGetInfo* inst);
+_BUR_PUBLIC void dbGetErrorMessage(struct dbGetErrorMessage* inst);
+
+
 /* Constants */
 #ifdef _REPLACE_CONST
  #define DB_ENCODING_UTF_8 "UTF-8"
@@ -225,9 +406,6 @@ extern "C"
  #define DB_SYSTEM_MS_SQL 2U
  #define DB_SYSTEM_SYBASE 1U
 #else
- #ifndef _GLOBAL_CONST
-   #define _GLOBAL_CONST _WEAK const
- #endif
  _GLOBAL_CONST plcstring DB_ENCODING_UTF_8[13];
  _GLOBAL_CONST plcstring DB_ENCODING_ISO_8859_1[13];
  _GLOBAL_CONST unsigned short dbERR_UNSUPPORTED_ENCODING;
@@ -438,187 +616,6 @@ extern "C"
 #endif
 
 
-
-
-/* Datatypes and datatypes of function blocks */
-typedef struct dbConnect
-{
-	/* VAR_INPUT (analog) */
-	unsigned long pServerName;
-	unsigned long pUserName;
-	unsigned long pPassword;
-	unsigned long pDatabaseName;
-	unsigned long databaseSystem;
-	/* VAR_OUTPUT (analog) */
-	unsigned short status;
-	signed short dbError;
-	unsigned long connectionIdent;
-	/* VAR (analog) */
-	unsigned short _statemachine;
-	unsigned short _result;
-	/* VAR_INPUT (digital) */
-	plcbit enable;
-} dbConnect_typ;
-
-typedef struct dbConnectEnc
-{
-	/* VAR_INPUT (analog) */
-	unsigned long pServerName;
-	unsigned long pUserName;
-	unsigned long pPassword;
-	unsigned long pDatabaseName;
-	unsigned long databaseSystem;
-	unsigned long pEncoding;
-	/* VAR_OUTPUT (analog) */
-	unsigned short status;
-	signed short dbError;
-	unsigned long connectionIdent;
-	/* VAR (analog) */
-	unsigned short _statemachine;
-	unsigned short _result;
-	/* VAR_INPUT (digital) */
-	plcbit enable;
-} dbConnectEnc_typ;
-
-typedef struct dbExecuteSql
-{
-	/* VAR_INPUT (analog) */
-	unsigned long connectionIdent;
-	unsigned long pSqlStatement;
-	/* VAR_OUTPUT (analog) */
-	unsigned short status;
-	signed short dbError;
-	/* VAR (analog) */
-	unsigned short _statemachine;
-	unsigned short _result;
-	/* VAR_INPUT (digital) */
-	plcbit enable;
-} dbExecuteSql_typ;
-
-typedef struct dbGetAffectedRows
-{
-	/* VAR_INPUT (analog) */
-	unsigned long connectionIdent;
-	/* VAR_OUTPUT (analog) */
-	unsigned short status;
-	signed short dbError;
-	unsigned long affectedRows;
-	/* VAR (analog) */
-	unsigned short _statemachine;
-	unsigned short _result;
-	/* VAR_INPUT (digital) */
-	plcbit enable;
-} dbGetAffectedRows_typ;
-
-typedef struct dbGetColumnCount
-{
-	/* VAR_INPUT (analog) */
-	unsigned long connectionIdent;
-	/* VAR_OUTPUT (analog) */
-	unsigned short status;
-	signed short dbError;
-	signed short columnCount;
-	/* VAR (analog) */
-	unsigned short _statemachine;
-	unsigned short _result;
-	/* VAR_INPUT (digital) */
-	plcbit enable;
-} dbGetColumnCount_typ;
-
-typedef struct dbFetchNextRow
-{
-	/* VAR_INPUT (analog) */
-	unsigned long connectionIdent;
-	/* VAR_OUTPUT (analog) */
-	unsigned short status;
-	signed short dbError;
-	/* VAR (analog) */
-	unsigned short _statemachine;
-	unsigned short _result;
-	/* VAR_INPUT (digital) */
-	plcbit enable;
-} dbFetchNextRow_typ;
-
-typedef struct dbGetData
-{
-	/* VAR_INPUT (analog) */
-	unsigned long connectionIdent;
-	unsigned long columnIdx;
-	signed short dataType;
-	unsigned long pData;
-	unsigned long dataSize;
-	/* VAR_OUTPUT (analog) */
-	unsigned short status;
-	signed short dbError;
-	unsigned long actDataSize;
-	/* VAR_INPUT (digital) */
-	plcbit enable;
-} dbGetData_typ;
-
-typedef struct dbDisconnect
-{
-	/* VAR_INPUT (analog) */
-	unsigned long connectionIdent;
-	/* VAR_OUTPUT (analog) */
-	unsigned short status;
-	signed short dbError;
-	/* VAR (analog) */
-	unsigned short _statemachine;
-	unsigned short _result;
-	/* VAR_INPUT (digital) */
-	plcbit enable;
-} dbDisconnect_typ;
-
-typedef struct dbGetInfo
-{
-	/* VAR_INPUT (analog) */
-	unsigned long connectionIdent;
-	unsigned short infoType;
-	unsigned long pServerInfo;
-	unsigned long serverInfoSize;
-	/* VAR_OUTPUT (analog) */
-	unsigned short status;
-	signed short dbError;
-	unsigned short actServerInfoSize;
-	/* VAR (analog) */
-	unsigned short _statemachine;
-	unsigned short _result;
-	/* VAR_INPUT (digital) */
-	plcbit enable;
-} dbGetInfo_typ;
-
-typedef struct dbGetErrorMessage
-{
-	/* VAR_INPUT (analog) */
-	unsigned long connectionIdent;
-	unsigned long pErrorMessage;
-	unsigned long errorMessageSize;
-	/* VAR_OUTPUT (analog) */
-	unsigned short status;
-	signed short dbError;
-	unsigned char sqlState[6];
-	signed long nativeError;
-	signed short actErrorMessageSize;
-	/* VAR (analog) */
-	unsigned short _statemachine;
-	unsigned short _result;
-	/* VAR_INPUT (digital) */
-	plcbit enable;
-} dbGetErrorMessage_typ;
-
-
-
-/* Prototyping of functions and function blocks */
-_BUR_PUBLIC void dbConnect(struct dbConnect* inst);
-_BUR_PUBLIC void dbConnectEnc(struct dbConnectEnc* inst);
-_BUR_PUBLIC void dbExecuteSql(struct dbExecuteSql* inst);
-_BUR_PUBLIC void dbGetAffectedRows(struct dbGetAffectedRows* inst);
-_BUR_PUBLIC void dbGetColumnCount(struct dbGetColumnCount* inst);
-_BUR_PUBLIC void dbFetchNextRow(struct dbFetchNextRow* inst);
-_BUR_PUBLIC void dbGetData(struct dbGetData* inst);
-_BUR_PUBLIC void dbDisconnect(struct dbDisconnect* inst);
-_BUR_PUBLIC void dbGetInfo(struct dbGetInfo* inst);
-_BUR_PUBLIC void dbGetErrorMessage(struct dbGetErrorMessage* inst);
 
 
 #ifdef __cplusplus
