@@ -91,6 +91,11 @@ jobs:
           output-dir:  ${{ steps.export-dir.outputs.path }}
           version:     ${{ steps.version.outputs.version }}
 
+      - name: Copy README into package
+        shell: pwsh
+        run: |
+          Copy-Item -Path README.md -Destination "${{ steps.export-dir.outputs.path }}/README.md" -Force
+
       - name: Publish to GitHub Packages
         shell: pwsh
         env:
