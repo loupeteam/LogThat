@@ -18,6 +18,6 @@
   <Dependencies>
     <Dependency ObjectName="ArEventLog" />
     <Dependency ObjectName="AsBrStr" />
-    <Dependency ObjectName="StringExt" FromVersion="0.14.1" />
+    <Dependency ObjectName="StringExt" FromVersion="1.0.0" />
   </Dependencies>
 </Library>

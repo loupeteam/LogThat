@@ -1,6 +1,6 @@
 /* Automation Studio generated header file */
 /* Do not edit ! */
-/* stringext 0.16.0 */
+/* stringext 1.0.0 */
 
 #ifndef _STRINGEXT_
 #define _STRINGEXT_
@@ -9,7 +9,7 @@ extern "C"
 {
 #endif
 #ifndef _stringext_VERSION
-#define _stringext_VERSION 0.16.0
+#define _stringext_VERSION 1.0.0
 #endif
 
 #include <bur/plctypes.h>
