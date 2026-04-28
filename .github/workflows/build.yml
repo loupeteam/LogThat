@@ -14,6 +14,15 @@ on:
         type: choice
         options: [Build, Rebuild]
 
+  # Build PRs. Outside contributors are gated by the repo-level
+  # "Require approval" setting (see Prerequisites). Do NOT use
+  # pull_request_target.
+  pull_request:
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+      - 'LICENSE'
+
 jobs:
   build:
     runs-on: [AS6-runner]
@@ -26,11 +35,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ inputs.ref }}
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
 
       - name: Find AS6 build executable
         uses: loupeteam/br-actions/find-as6-build@v1
