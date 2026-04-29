@@ -1,0 +1,127 @@
+name: Build, Export, and Publish
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish (e.g. v0.6.0)'
+        required: true
+
+jobs:
+  build-export-publish:
+    runs-on: [AS6-runner]
+
+    permissions:
+      contents: read
+      packages: write
+
+    env:
+      PROJECT:     example/AsProject/AsProject.apj
+      LIBRARY_DIR: src/Ar/LogThat
+      EXPORT_DIR:  export
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@loupeteam'
+
+      - name: Resolve version
+        id: version
+        shell: pwsh
+        run: |
+          if ($env:GITHUB_REF_TYPE -eq 'tag') {
+            $ver = $env:GITHUB_REF_NAME -replace '^v', ''
+          } else {
+            $ver = "${{ inputs.version }}" -replace '^v', ''
+          }
+          if (-not $ver) { Write-Error "No version"; exit 1 }
+          "version=$ver" | Out-File -Append -Encoding utf8 -FilePath $env:GITHUB_OUTPUT
+
+      - name: Find AS6 build executable
+        uses: loupeteam/br-actions/find-as6-build@v1
+        id: find-as
+
+      - name: Resolve project paths
+        id: project
+        shell: pwsh
+        run: |
+          $apj = "${{ env.PROJECT }}"
+          if (-not (Test-Path $apj)) { Write-Error "Project file not found: $apj"; exit 1 }
+          $dir = Split-Path $apj -Parent
+          "dir=$dir" | Out-File -Append -Encoding utf8 -FilePath $env:GITHUB_OUTPUT
+
+          $libDir = "${{ env.LIBRARY_DIR }}"
+          $lby = Get-ChildItem -Path $libDir -Filter *.lby -File |
+                   Select-Object -First 1
+          if (-not $lby) { Write-Error "No .lby file found in: $libDir"; exit 1 }
+          $libName = [System.IO.Path]::GetFileNameWithoutExtension($lby.Name)
+          "library=$libName" | Out-File -Append -Encoding utf8 -FilePath $env:GITHUB_OUTPUT
+
+      - name: Build Intel
+        uses: loupeteam/br-actions/build-as-project@v1
+        with:
+          exe-path: ${{ steps.find-as.outputs.exe-path }}
+          project:  ${{ env.PROJECT }}
+          config:   Intel
+
+      - name: Build ARM
+        uses: loupeteam/br-actions/build-as-project@v1
+        with:
+          exe-path: ${{ steps.find-as.outputs.exe-path }}
+          project:  ${{ env.PROJECT }}
+          config:   ARM
+
+      - name: Export library
+        uses: loupeteam/br-actions/export-as-library@v1
+        with:
+          project-dir: ${{ steps.project.outputs.dir }}
+          library:     ${{ steps.project.outputs.library }}
+          library-dir: ${{ env.LIBRARY_DIR }}
+          configs:     Intel ARM
+          output:      ${{ env.EXPORT_DIR }}
+          as-install:  ${{ steps.find-as.outputs.install-path }}
+
+      - name: Locate exported version directory
+        id: export-dir
+        shell: pwsh
+        run: |
+          $path = Get-ChildItem "$env:EXPORT_DIR/${{ steps.project.outputs.library }}" -Directory |
+                  Select-Object -First 1 -ExpandProperty FullName
+          "path=$path" | Out-File -Append -Encoding utf8 -FilePath $env:GITHUB_OUTPUT
+
+      - name: Generate package.json
+        uses: loupeteam/br-actions/prepare-lpm-package@v1
+        with:
+          library-dir: ${{ env.LIBRARY_DIR }}
+          output-dir:  ${{ steps.export-dir.outputs.path }}
+          version:     ${{ steps.version.outputs.version }}
+
+      - name: Copy README into package
+        shell: pwsh
+        run: |
+          Copy-Item -Path README.md -Destination "${{ steps.export-dir.outputs.path }}/README.md" -Force
+
+      - name: Publish to GitHub Packages
+        shell: pwsh
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          Push-Location "${{ steps.export-dir.outputs.path }}"
+          npm publish
+          Pop-Location
+
+      - name: Upload exported library artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.project.outputs.library }}-${{ steps.version.outputs.version }}
+          path: ${{ env.EXPORT_DIR }}/${{ steps.project.outputs.library }}/
+          if-no-files-found: error

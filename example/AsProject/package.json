@@ -16,7 +16,6 @@
         "gitClient": "GitExtensions"
     },
     "dependencies": {
-        "@loupeteam/librarybuilderproject": "^0.3.0",
-        "@loupeteam/logthat": "^0.5.1"
+        "@loupeteam/stringext": "^1.0.0"
     }
 }
