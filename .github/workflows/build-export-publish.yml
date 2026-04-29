@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to publish (e.g. v0.6.0)'
+        description: 'Version to publish (e.g. v1.0.1)'
         required: true
 
 jobs:
@@ -20,6 +20,8 @@ jobs:
 
     env:
       PROJECT:     example/AsProject/AsProject.apj
+      PROJECT_DIR: example/AsProject
+      LIBRARY:     LogThat
       LIBRARY_DIR: src/Ar/LogThat
       EXPORT_DIR:  export
 
@@ -43,28 +45,16 @@ jobs:
           } else {
             $ver = "${{ inputs.version }}" -replace '^v', ''
           }
-          if (-not $ver) { Write-Error "No version"; exit 1 }
+          if (-not $ver) {
+            Write-Error "Could not determine version. Push a v*.*.* tag or supply the version input."
+            exit 1
+          }
+          Write-Host "Publishing version: $ver"
           "version=$ver" | Out-File -Append -Encoding utf8 -FilePath $env:GITHUB_OUTPUT
 
       - name: Find AS6 build executable
         uses: loupeteam/br-actions/find-as6-build@v1
         id: find-as
-
-      - name: Resolve project paths
-        id: project
-        shell: pwsh
-        run: |
-          $apj = "${{ env.PROJECT }}"
-          if (-not (Test-Path $apj)) { Write-Error "Project file not found: $apj"; exit 1 }
-          $dir = Split-Path $apj -Parent
-          "dir=$dir" | Out-File -Append -Encoding utf8 -FilePath $env:GITHUB_OUTPUT
-
-          $libDir = "${{ env.LIBRARY_DIR }}"
-          $lby = Get-ChildItem -Path $libDir -Filter *.lby -File |
-                   Select-Object -First 1
-          if (-not $lby) { Write-Error "No .lby file found in: $libDir"; exit 1 }
-          $libName = [System.IO.Path]::GetFileNameWithoutExtension($lby.Name)
-          "library=$libName" | Out-File -Append -Encoding utf8 -FilePath $env:GITHUB_OUTPUT
 
       - name: Build Intel
         uses: loupeteam/br-actions/build-as-project@v1
@@ -83,8 +73,8 @@ jobs:
       - name: Export library
         uses: loupeteam/br-actions/export-as-library@v1
         with:
-          project-dir: ${{ steps.project.outputs.dir }}
-          library:     ${{ steps.project.outputs.library }}
+          project-dir: ${{ env.PROJECT_DIR }}
+          library:     ${{ env.LIBRARY }}
           library-dir: ${{ env.LIBRARY_DIR }}
           configs:     Intel ARM
           output:      ${{ env.EXPORT_DIR }}
@@ -94,8 +84,13 @@ jobs:
         id: export-dir
         shell: pwsh
         run: |
-          $path = Get-ChildItem "$env:EXPORT_DIR/${{ steps.project.outputs.library }}" -Directory |
+          $path = Get-ChildItem "$env:EXPORT_DIR/$env:LIBRARY" -Directory |
                   Select-Object -First 1 -ExpandProperty FullName
+          if (-not $path) {
+            Write-Error "No exported version directory found under $env:EXPORT_DIR/$env:LIBRARY"
+            exit 1
+          }
+          Write-Host "Exported version directory: $path"
           "path=$path" | Out-File -Append -Encoding utf8 -FilePath $env:GITHUB_OUTPUT
 
       - name: Generate package.json
@@ -115,6 +110,7 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          Write-Host "Publishing @loupeteam/$($env:LIBRARY.ToLower())@${{ steps.version.outputs.version }}"
           Push-Location "${{ steps.export-dir.outputs.path }}"
           npm publish
           Pop-Location
@@ -122,6 +118,14 @@ jobs:
       - name: Upload exported library artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ steps.project.outputs.library }}-${{ steps.version.outputs.version }}
-          path: ${{ env.EXPORT_DIR }}/${{ steps.project.outputs.library }}/
+          name: ${{ env.LIBRARY }}-${{ steps.version.outputs.version }}
+          path: ${{ env.EXPORT_DIR }}/${{ env.LIBRARY }}/
           if-no-files-found: error
+
+      - name: Upload build diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: BuildDiagnostics
+          path: example/AsProject/Temp/BuildDiagnostics.log
+          if-no-files-found: ignore
