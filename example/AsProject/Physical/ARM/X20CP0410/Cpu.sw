@@ -30,7 +30,6 @@
     <LibraryObject Name="AsArProf" Source="Libraries._AS.AsArProf.lby" Memory="UserROM" Language="binary" Debugging="true" />
     <LibraryObject Name="AsBrMath" Source="Libraries._AS.AsBrMath.lby" Memory="UserROM" Language="binary" Debugging="true" />
     <LibraryObject Name="AsBrStr" Source="Libraries._AS.AsBrStr.lby" Memory="UserROM" Language="binary" Debugging="true" />
-    <LibraryObject Name="AsDb" Source="Libraries._AS.AsDb.lby" Memory="UserROM" Language="binary" Debugging="true" />
     <LibraryObject Name="AsEPL" Source="Libraries._AS.AsEPL.lby" Memory="UserROM" Language="binary" Debugging="true" />
     <LibraryObject Name="AsGuard" Source="Libraries._AS.AsGuard.lby" Memory="UserROM" Language="binary" Debugging="true" />
     <LibraryObject Name="AsHttp" Source="Libraries._AS.AsHttp.lby" Memory="UserROM" Language="binary" Debugging="true" />
