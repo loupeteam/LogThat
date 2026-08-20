@@ -1,5 +1,8 @@
 # Change log
 
+- 1.0.0 - Update the example project for AS6: remove the deprecated AsDb and Motion libraries
+    - Update StringExt in the example project to a released version
+    - Add package.json so the library can be installed with LPM
 - 0.05.1 - Rename problematic 'delete' internal var to 'deletion' (to avoid C++ keyword conflict in older AS versions)
 - 0.05.0 - Remove constants: LOG_DEFAULT_MESSAGESIZE, LOG_DEFAULT_BUFFEREDENTRIES
     - Remove ManageLoggers Fn
