@@ -25,12 +25,26 @@
 // Monitor a state variable and log changes
 //------------------------------------------
 
-// First call - looks good
-// Other calls - 
-
 void logStateChange(struct logStateChange* inst) {
 	
 	StrExtArgs_typ LogData;
+	unsigned char firstCall = !inst->initialized;
+	
+	// Seed defaults and stored state before building LogData, so the start
+	//  message reports the state present on the first call
+	if (firstCall) {
+		
+		// Default logger and module name
+		if (strcmp(inst->LoggerName, "") == 0) strcpy(inst->LoggerName, "State");	
+		if (strcmp(inst->ModuleName, "") == 0) strcpy(inst->ModuleName, "State");
+		
+		// Initialize old data
+		inst->oldState = inst->State;
+		strcpy(inst->oldStateName, inst->StateName);
+		
+	}
+	
+	memset(&LogData, 0, sizeof(LogData));
 	
 	LogData.i[0]= (DINT)inst->oldState;
 	LogData.i[1]= (DINT)inst->State;
@@ -40,19 +54,9 @@ void logStateChange(struct logStateChange* inst) {
 	LogData.s[2]= (UDINT)inst->StateName;
 	
 	// First call
-	if (!inst->initialized) {
-		
-		// Default logger and module name
-		// TODO: This seems like a bad default given the changes
-		if (strcmp(inst->LoggerName, "") == 0) strcpy(inst->LoggerName, "State");	
-		if (strcmp(inst->ModuleName, "") == 0) strcpy(inst->ModuleName, "State");
-	
-		// Initialize old data
-		inst->oldState = inst->State;
-		strcpy(inst->oldStateName, inst->StateName);
+	if (firstCall) {
 		
 		if (strcmp(inst->StateName, "") == 0) {
-			// TODO: msgData is not currently supported
 			inst->Status = logInfo(inst->LoggerName, 0, "%s start in state %i", (UDINT)&LogData);
 		} else {
 			inst->Status = logInfo(inst->LoggerName, 0, "%s start in state %s (%i)", (UDINT)&LogData);
