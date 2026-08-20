@@ -42,6 +42,20 @@ logWarning("App", 300, "Recipe %s reported %i faults", (UDINT)&msgData);
 
 Every function returns a status. `0` means the entry was written; `LOG_ERR_INVALIDINPUT` (58300) means a required input was missing, and any other value is passed through from ArEventLog (most often because the logbook has not been created).
 
+# Naming a logbook
+
+Logbooks are stored as Automation Runtime modules and share one namespace with every other module on the target, including the tasks and programs in the project. Creating a logbook named after an existing task fails with `arEVENTLOG_ERR_MODULE_EXISTS` (-1070586084) and no logbook is created, so every later write fails too. Pick a name that is not a task, program, or module name, keep it within 8 characters, and do not start it with `$`.
+
+On a restart, a logbook created with `LOG_PERSISTENCE_REMANENT` or `LOG_PERSISTENCE_PERSIST` is still there, so `createLogInit` returns `arEVENTLOG_ERR_LOGBOOK_EXISTS` (-1070586095). That is expected and not a failure:
+
+```c
+DINT status = createLogInit("App", 1000000, LOG_PERSISTENCE_PERSIST);
+
+if (status == 0 || status == arEVENTLOG_ERR_LOGBOOK_EXISTS) {
+	// Logbook is ready to use
+}
+```
+
 # Dependencies
 - ArEventLog and AsBrStr, both shipped with Automation Studio
 - Loupe's [StringExt](https://github.com/loupeteam/StringExt) library, used for message formatting
