@@ -11,12 +11,12 @@ For more documentation and examples, see https://loupeteam.github.io/LoupeDocs/l
 
 # Quick start
 
-Create the logbook once from an `_INIT` routine. Names are limited to 8 characters and the log data area is 4096 bytes minimum.
+Create the logbook once from an `_INIT` routine. Names are limited to 8 characters and the log data area is 4096 bytes minimum. Use `LOG_PERSISTENCE_PERSIST` unless you have a reason not to: log entries matter most after the restart that followed the problem, and a volatile logbook is empty by then.
 
 ```c
 void _INIT ProgramInit(void)
 {
-	createLogInit("App", 1000000, LOG_PERSISTENCE_VOLATILE);
+	createLogInit("App", 1000000, LOG_PERSISTENCE_PERSIST);
 }
 ```
 
