@@ -25,12 +25,17 @@ Note that persistent and remanent entries live in a DRAM image copied to the bac
 Write entries from anywhere. The second argument is a user defined code written into the event ID, and the last argument is a pointer to format arguments (`0` when the message has no runtime values).
 
 ```c
-logInfo("App", 0, "Machine started", 0);
-logWarning("App", 100, "Infeed sensor blocked", 0);
-logError("App", 200, "Drive fault, machine stopped", 0);
+void _CYCLIC ProgramCyclic(void)
+{
+	logInfo("App", 0, "Machine started", 0);
+	logWarning("App", 100, "Infeed sensor blocked", 0);
+	logError("App", 200, "Drive fault, machine stopped", 0);
+}
 ```
 
-To include runtime values, fill in a `StrExtArgs_typ` and pass its address. Each specifier consumes the next unused member of the matching type: `%i`/`%d` from `i[]`, `%r`/`%f` from `r[]`, `%s` from `s[]` (string addresses), and `%b` from `b[]`. There are five members of each type, and a sixth specifier of the same type is dropped from the message without an error. Use `%%` for a literal percent sign: an unrecognized specifier is silently dropped along with the character after it, so a stray `%` in operator text eats the next character.
+To include runtime values, fill in a `StrExtArgs_typ` and pass its address. Each specifier consumes the next unused member of the matching type: `%i`/`%d` from `i[]`, `%r`/`%f` from `r[]`, `%s` from `s[]` (string addresses), and `%b` from `b[]`. There are five members of each type, and a sixth specifier of the same type is dropped from the message without an error.
+
+Formatting happens only when `pMsgData` is non-zero. With `0` the message is written to the logger verbatim, percent signs included. When you do pass arguments, use `%%` for a literal percent: an unrecognized `%` is dropped together with the single character that follows it, so a stray `%` in operator text eats the next character.
 
 ```c
 void _CYCLIC ProgramCyclic(void)
@@ -62,9 +67,8 @@ void _INIT ProgramInit(void)
 {
 	DINT status = createLogInit("App", 100000, LOG_PERSISTENCE_PERSIST);
 
-	if (status == 0 || status == arEVENTLOG_ERR_LOGBOOK_EXISTS) {
-		// Create was accepted, confirm on the first write
-		gLogReady = 1;
+	if (status != 0 && status != arEVENTLOG_ERR_LOGBOOK_EXISTS) {
+		// Create failed for a real reason, most likely a name collision
 	}
 }
 ```

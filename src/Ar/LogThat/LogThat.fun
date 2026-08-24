@@ -35,8 +35,8 @@ END_FUNCTION
 	VAR_INPUT
 		loggerName : STRING[LOG_STRLEN_LOGGERNAME]; (*Name of the logbook the message is added to*)
 		eventID : DINT; (*Event ID containing severity, facility, and code. The customer bit is set internally*)
-		eventString : STRING[LOG_STRLEN_MESSAGE]; (*Event message, may contain formatters (%i %d %r %f %s %b), %% for a literal percent*)
-		pMsgData : UDINT; (*Address of a StrExtArgs_typ with the format arguments, or 0 for none. Max 5 per type*)
+		eventString : STRING[LOG_STRLEN_MESSAGE]; (*Event message, when pMsgData is supplied it may contain formatters (%i %d %r %f %s %b), and %% for a literal percent*)
+		pMsgData : UDINT; (*Address of a StrExtArgs_typ with the format arguments, max 5 of each type (i/r/s/b). 0 writes the message verbatim, with no formatting*)
 	END_VAR
 END_FUNCTION
 
@@ -44,8 +44,8 @@ END_FUNCTION
 	VAR_INPUT
 		loggerName : STRING[LOG_STRLEN_LOGGERNAME]; (*Name of the logbook the message is added to*)
 		errorID : UINT; (*User defined code written into the event ID*)
-		errorString : STRING[LOG_STRLEN_MESSAGE]; (*Message for logger entry, may contain formatters (%i %d %r %f %s %b), %% for a literal percent*)
-		pMsgData : UDINT; (*Address of a StrExtArgs_typ with the format arguments, or 0 for none. Max 5 per type*)
+		errorString : STRING[LOG_STRLEN_MESSAGE]; (*Message for logger entry, when pMsgData is supplied it may contain formatters (%i %d %r %f %s %b), and %% for a literal percent*)
+		pMsgData : UDINT; (*Address of a StrExtArgs_typ with the format arguments, max 5 of each type (i/r/s/b). 0 writes the message verbatim, with no formatting*)
 	END_VAR
 END_FUNCTION
 (*Legacy*)
@@ -54,8 +54,8 @@ END_FUNCTION
 	VAR_INPUT
 		loggerName : STRING[LOG_STRLEN_LOGGERNAME]; (*Name of the logbook the message is added to*)
 		errorID : UINT; (*User defined code written into the event ID*)
-		errorString : STRING[LOG_STRLEN_MESSAGE]; (*Message for logger entry, may contain formatters (%i %d %r %f %s %b), %% for a literal percent*)
-		pMsgData : UDINT; (*Address of a StrExtArgs_typ with the format arguments, or 0 for none. Max 5 per type*)
+		errorString : STRING[LOG_STRLEN_MESSAGE]; (*Message for logger entry, when pMsgData is supplied it may contain formatters (%i %d %r %f %s %b), and %% for a literal percent*)
+		pMsgData : UDINT; (*Address of a StrExtArgs_typ with the format arguments, max 5 of each type (i/r/s/b). 0 writes the message verbatim, with no formatting*)
 	END_VAR
 END_FUNCTION
 
@@ -63,8 +63,8 @@ END_FUNCTION
 	VAR_INPUT
 		loggerName : STRING[LOG_STRLEN_LOGGERNAME]; (*Name of the logbook the message is added to*)
 		errorID : UINT; (*User defined code written into the event ID*)
-		errorString : STRING[LOG_STRLEN_MESSAGE]; (*Message for logger entry, may contain formatters (%i %d %r %f %s %b), %% for a literal percent*)
-		pMsgData : UDINT; (*Address of a StrExtArgs_typ with the format arguments, or 0 for none. Max 5 per type*)
+		errorString : STRING[LOG_STRLEN_MESSAGE]; (*Message for logger entry, when pMsgData is supplied it may contain formatters (%i %d %r %f %s %b), and %% for a literal percent*)
+		pMsgData : UDINT; (*Address of a StrExtArgs_typ with the format arguments, max 5 of each type (i/r/s/b). 0 writes the message verbatim, with no formatting*)
 	END_VAR
 END_FUNCTION
 
@@ -72,8 +72,8 @@ END_FUNCTION
 	VAR_INPUT
 		loggerName : STRING[LOG_STRLEN_LOGGERNAME]; (*Name of the logbook the message is added to*)
 		errorID : UINT; (*User defined code written into the event ID*)
-		errorString : STRING[LOG_STRLEN_MESSAGE]; (*Message for logger entry, may contain formatters (%i %d %r %f %s %b), %% for a literal percent*)
-		pMsgData : UDINT; (*Address of a StrExtArgs_typ with the format arguments, or 0 for none. Max 5 per type*)
+		errorString : STRING[LOG_STRLEN_MESSAGE]; (*Message for logger entry, when pMsgData is supplied it may contain formatters (%i %d %r %f %s %b), and %% for a literal percent*)
+		pMsgData : UDINT; (*Address of a StrExtArgs_typ with the format arguments, max 5 of each type (i/r/s/b). 0 writes the message verbatim, with no formatting*)
 	END_VAR
 END_FUNCTION
 
