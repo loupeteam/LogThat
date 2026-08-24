@@ -24,7 +24,7 @@ Note that persistent and remanent entries live in a DRAM image copied to the bac
 
 Write entries from anywhere. The second argument is a user defined code written into the event ID, and the last argument is a pointer to format arguments (`0` when the message has no runtime values).
 
-A log entry is a one-shot event, so call these on a transition rather than unconditionally in a cyclic body, which would write an entry every scan and churn the logbook.
+A log entry is a one-shot event, so call these on a transition rather than unconditionally in a cyclic body, which would write an entry every scan and churn the logbook. Application variables such as the edge flags below are not declared in these snippets.
 
 ```c
 void _CYCLIC ProgramCyclic(void)
@@ -34,8 +34,6 @@ void _CYCLIC ProgramCyclic(void)
 	if (faultEdge) logError("App", 200, "Drive fault, machine stopped", 0);
 }
 ```
-
-Snippets below leave application variables undeclared unless the rendered output depends on them.
 
 To include runtime values, fill in a `StrExtArgs_typ` and pass its address. Each specifier consumes the next unused member of the matching type: `%i`/`%d` from `i[]`, `%r`/`%f` from `r[]`, `%s` from `s[]` (string addresses), and `%b` from `b[]`. There are five members of each type, and a sixth specifier of the same type is dropped from the message without an error.
 
@@ -48,13 +46,16 @@ void _CYCLIC ProgramCyclic(void)
 	plcstring recipeName[32] = "Widget";
 
 	StrExtArgs_typ msgData;
-	memset(&msgData, 0, sizeof(msgData));
 
-	msgData.i[0] = errorCount;
-	msgData.s[0] = (UDINT)recipeName;
+	if (faultEdge) {
+		memset(&msgData, 0, sizeof(msgData));
 
-	logWarning("App", 300, "Recipe %s reported %i faults", (UDINT)&msgData);
-	// -> "Recipe Widget reported 3 faults"
+		msgData.i[0] = errorCount;
+		msgData.s[0] = (UDINT)recipeName;
+
+		logWarning("App", 300, "Recipe %s reported %i faults", (UDINT)&msgData);
+		// -> "Recipe Widget reported 3 faults"
+	}
 }
 ```
 
