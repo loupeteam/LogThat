@@ -9,7 +9,7 @@
 FUNCTION_BLOCK logDelete (*Delete a logbook and all of its entries. Call cyclically until done or error, then clear execute*)
 	VAR_INPUT
 		name : STRING[LOG_STRLEN_LOGGERNAME]; (*Name of the logbook to be deleted*)
-		execute : BOOL; (*Rising edge starts the delete*)
+		execute : BOOL; (*Hold TRUE until done or error. Clearing it aborts the delete*)
 	END_VAR
 	VAR_OUTPUT
 		done : BOOL; (*Delete finished successfully*)
@@ -35,7 +35,7 @@ END_FUNCTION
 	VAR_INPUT
 		loggerName : STRING[LOG_STRLEN_LOGGERNAME]; (*Name of the logbook the message is added to*)
 		eventID : DINT; (*Event ID containing severity, facility, and code. The customer bit is set internally*)
-		eventString : STRING[LOG_STRLEN_MESSAGE]; (*Event message, may contain formatters (%i %r %s %b)*)
+		eventString : STRING[LOG_STRLEN_MESSAGE]; (*Event message, may contain formatters (%i %d %r %f %s %b)*)
 		pMsgData : UDINT; (*Address of a StrExtArgs_typ with the format arguments, or 0 for none*)
 	END_VAR
 END_FUNCTION
@@ -44,16 +44,17 @@ END_FUNCTION
 	VAR_INPUT
 		loggerName : STRING[LOG_STRLEN_LOGGERNAME]; (*Name of the logbook the message is added to*)
 		errorID : UINT; (*User defined code written into the event ID*)
-		errorString : STRING[LOG_STRLEN_MESSAGE]; (*Message for logger entry, may contain formatters (%i %r %s %b)*)
+		errorString : STRING[LOG_STRLEN_MESSAGE]; (*Message for logger entry, may contain formatters (%i %d %r %f %s %b)*)
 		pMsgData : UDINT; (*Address of a StrExtArgs_typ with the format arguments, or 0 for none*)
 	END_VAR
 END_FUNCTION
+(*Legacy*)
 
 {REDUND_CONTEXT} FUNCTION logWarning : DINT (*Write a warning message to the logger*) (*$GROUP=User,$CAT=User,$GROUPICON=User.png,$CATICON=User.png*)
 	VAR_INPUT
 		loggerName : STRING[LOG_STRLEN_LOGGERNAME]; (*Name of the logbook the message is added to*)
 		errorID : UINT; (*User defined code written into the event ID*)
-		errorString : STRING[LOG_STRLEN_MESSAGE]; (*Message for logger entry, may contain formatters (%i %r %s %b)*)
+		errorString : STRING[LOG_STRLEN_MESSAGE]; (*Message for logger entry, may contain formatters (%i %d %r %f %s %b)*)
 		pMsgData : UDINT; (*Address of a StrExtArgs_typ with the format arguments, or 0 for none*)
 	END_VAR
 END_FUNCTION
@@ -62,7 +63,7 @@ END_FUNCTION
 	VAR_INPUT
 		loggerName : STRING[LOG_STRLEN_LOGGERNAME]; (*Name of the logbook the message is added to*)
 		errorID : UINT; (*User defined code written into the event ID*)
-		errorString : STRING[LOG_STRLEN_MESSAGE]; (*Message for logger entry, may contain formatters (%i %r %s %b)*)
+		errorString : STRING[LOG_STRLEN_MESSAGE]; (*Message for logger entry, may contain formatters (%i %d %r %f %s %b)*)
 		pMsgData : UDINT; (*Address of a StrExtArgs_typ with the format arguments, or 0 for none*)
 	END_VAR
 END_FUNCTION
@@ -71,12 +72,12 @@ END_FUNCTION
 	VAR_INPUT
 		loggerName : STRING[LOG_STRLEN_LOGGERNAME]; (*Name of the logbook the message is added to*)
 		errorID : UINT; (*User defined code written into the event ID*)
-		errorString : STRING[LOG_STRLEN_MESSAGE]; (*Message for logger entry, may contain formatters (%i %r %s %b)*)
+		errorString : STRING[LOG_STRLEN_MESSAGE]; (*Message for logger entry, may contain formatters (%i %d %r %f %s %b)*)
 		pMsgData : UDINT; (*Address of a StrExtArgs_typ with the format arguments, or 0 for none*)
 	END_VAR
 END_FUNCTION
 
-{REDUND_CONTEXT} FUNCTION_BLOCK logStateChange (*Log an info entry whenever State changes. Call cyclically*) (*$GROUP=User*)
+{REDUND_CONTEXT} FUNCTION_BLOCK logStateChange (*Log an info entry on the first call and whenever State changes after that. Call cyclically*) (*$GROUP=User*)
 	VAR_INPUT
 		LoggerName : STRING[LOG_STRLEN_LOGGERNAME]; (*Name of logger for messages to be added. Defaults to 'State' if empty on the first call*)
 		ModuleName : STRING[LOG_STRLEN_MODULENAME]; (*Name of module with state changes. Defaults to 'State' if empty on the first call*)
