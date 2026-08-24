@@ -30,20 +30,23 @@ logWarning("App", 100, "Infeed sensor blocked", 0);
 logError("App", 200, "Drive fault, machine stopped", 0);
 ```
 
-To include runtime values, fill in a `StrExtArgs_typ` and pass its address. Each specifier consumes the next unused member of the matching type: `%i`/`%d` from `i[]`, `%r`/`%f` from `r[]`, `%s` from `s[]` (string addresses), and `%b` from `b[]`. There are five members of each type, and a sixth specifier of the same type is dropped from the message without an error.
+To include runtime values, fill in a `StrExtArgs_typ` and pass its address. Each specifier consumes the next unused member of the matching type: `%i`/`%d` from `i[]`, `%r`/`%f` from `r[]`, `%s` from `s[]` (string addresses), and `%b` from `b[]`. There are five members of each type, and a sixth specifier of the same type is dropped from the message without an error. Use `%%` for a literal percent sign: an unrecognized specifier is silently dropped along with the character after it, so a stray `%` in operator text eats the next character.
 
 ```c
-unsigned short errorCount = 3;
-plcstring recipeName[32] = "Widget";
+void _CYCLIC ProgramCyclic(void)
+{
+	unsigned short errorCount = 3;
+	plcstring recipeName[32] = "Widget";
 
-StrExtArgs_typ msgData;
-memset(&msgData, 0, sizeof(msgData));
+	StrExtArgs_typ msgData;
+	memset(&msgData, 0, sizeof(msgData));
 
-msgData.i[0] = errorCount;
-msgData.s[0] = (UDINT)recipeName;
+	msgData.i[0] = errorCount;
+	msgData.s[0] = (UDINT)recipeName;
 
-logWarning("App", 300, "Recipe %s reported %i faults", (UDINT)&msgData);
-// -> "Recipe Widget reported 3 faults"
+	logWarning("App", 300, "Recipe %s reported %i faults", (UDINT)&msgData);
+	// -> "Recipe Widget reported 3 faults"
+}
 ```
 
 The log functions return a status. `0` means the entry was written; `LOG_ERR_INVALIDINPUT` (58300) means a required input was missing, and any other value is passed through from ArEventLog (most often because the logbook has not been created).
@@ -55,10 +58,14 @@ Logbooks are stored as Automation Runtime modules and share one namespace with e
 A logbook that outlives the restart which reran `_INIT` is still there the next time `createLogInit` runs, so the create reports `arEVENTLOG_ERR_LOGBOOK_EXISTS` (-1070586095). `LOG_PERSISTENCE_PERSIST` survives a cold restart and `LOG_PERSISTENCE_REMANENT` survives a warm one, so with either of those this is the normal case rather than an error:
 
 ```c
-DINT status = createLogInit("App", 100000, LOG_PERSISTENCE_PERSIST);
+void _INIT ProgramInit(void)
+{
+	DINT status = createLogInit("App", 100000, LOG_PERSISTENCE_PERSIST);
 
-if (status == 0 || status == arEVENTLOG_ERR_LOGBOOK_EXISTS) {
-	// Logbook is ready to use
+	if (status == 0 || status == arEVENTLOG_ERR_LOGBOOK_EXISTS) {
+		// Create was accepted, confirm on the first write
+		gLogReady = 1;
+	}
 }
 ```
 
