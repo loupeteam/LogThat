@@ -65,7 +65,7 @@ The log functions return a status. `0` means the entry was written; `LOG_ERR_INV
 
 Logbooks are stored as Automation Runtime modules and share one namespace with every other module on the target, including the tasks and programs in the project. Creating a logbook named after an existing task fails with `arEVENTLOG_ERR_MODULE_EXISTS` (-1070586084) and no logbook is created, so every later write fails too. Pick a name that is not a task, program, or module name, keep it within 8 characters, and do not start it with `$`.
 
-A logbook that outlives the restart which reran `_INIT` is still there the next time `createLogInit` runs, so the create reports `arEVENTLOG_ERR_LOGBOOK_EXISTS` (-1070586095). `LOG_PERSISTENCE_PERSIST` survives a cold restart and `LOG_PERSISTENCE_REMANENT` survives a warm one, so with either of those this is the normal case rather than an error:
+A logbook that outlives the restart which reran `_INIT` is still there the next time `createLogInit` runs, so the create reports `arEVENTLOG_ERR_LOGBOOK_EXISTS` (-1070586095). `LOG_PERSISTENCE_PERSIST` survives a cold restart, so this is the normal case on every boot after the first. `LOG_PERSISTENCE_REMANENT` survives a warm restart only, so it is the normal case after one of those and the logbook is created fresh after a cold restart:
 
 ```c
 // Global: gLogCreateStatus : DINT
