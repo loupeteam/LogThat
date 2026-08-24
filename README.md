@@ -24,14 +24,18 @@ Note that persistent and remanent entries live in a DRAM image copied to the bac
 
 Write entries from anywhere. The second argument is a user defined code written into the event ID, and the last argument is a pointer to format arguments (`0` when the message has no runtime values).
 
+A log entry is a one-shot event, so call these on a transition rather than unconditionally in a cyclic body, which would write an entry every scan and churn the logbook.
+
 ```c
 void _CYCLIC ProgramCyclic(void)
 {
-	logInfo("App", 0, "Machine started", 0);
-	logWarning("App", 100, "Infeed sensor blocked", 0);
-	logError("App", 200, "Drive fault, machine stopped", 0);
+	if (startEdge) logInfo("App", 0, "Machine started", 0);
+	if (blockedEdge) logWarning("App", 100, "Infeed sensor blocked", 0);
+	if (faultEdge) logError("App", 200, "Drive fault, machine stopped", 0);
 }
 ```
+
+Snippets below leave application variables undeclared unless the rendered output depends on them.
 
 To include runtime values, fill in a `StrExtArgs_typ` and pass its address. Each specifier consumes the next unused member of the matching type: `%i`/`%d` from `i[]`, `%r`/`%f` from `r[]`, `%s` from `s[]` (string addresses), and `%b` from `b[]`. There are five members of each type, and a sixth specifier of the same type is dropped from the message without an error.
 
@@ -63,12 +67,16 @@ Logbooks are stored as Automation Runtime modules and share one namespace with e
 A logbook that outlives the restart which reran `_INIT` is still there the next time `createLogInit` runs, so the create reports `arEVENTLOG_ERR_LOGBOOK_EXISTS` (-1070586095). `LOG_PERSISTENCE_PERSIST` survives a cold restart and `LOG_PERSISTENCE_REMANENT` survives a warm one, so with either of those this is the normal case rather than an error:
 
 ```c
+// Global: gLogCreateStatus : DINT
+
 void _INIT ProgramInit(void)
 {
 	DINT status = createLogInit("App", 100000, LOG_PERSISTENCE_PERSIST);
 
 	if (status != 0 && status != arEVENTLOG_ERR_LOGBOOK_EXISTS) {
-		// Create failed for a real reason, most likely a name collision
+		// Unexpected, not necessarily fatal. Record it and confirm on the
+		//  first write. A name collision shows up here
+		gLogCreateStatus = status;
 	}
 }
 ```
