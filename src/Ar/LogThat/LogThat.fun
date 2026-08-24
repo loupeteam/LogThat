@@ -6,10 +6,10 @@
  * This file is part of LogThat, licensed under the MIT License.
  *)
 
-FUNCTION_BLOCK logDelete (*Delete a logbook and all of its entries. Call cyclically, holding execute until done or error, then clear it*)
+FUNCTION_BLOCK logDelete (*Delete a logbook and all of its entries. Call cyclically, holding execute until done or error, then clear it. Outputs follow the underlying ArEventLog FUBs on every call*)
 	VAR_INPUT
 		name : STRING[LOG_STRLEN_LOGGERNAME]; (*Name of the logbook to be deleted*)
-		execute : BOOL; (*Hold TRUE until done or error. Clearing it early abandons the operation and resets the outputs*)
+		execute : BOOL; (*Hold TRUE until done or error. Clearing it early stops driving the delete without cancelling it*)
 	END_VAR
 	VAR_OUTPUT
 		done : BOOL; (*Delete finished successfully*)
