@@ -48,7 +48,7 @@ END_FUNCTION
 		pMsgData : UDINT; (*Address of a StrExtArgs_typ with the format arguments, max 5 of each type (i/r/s/b). 0 writes the message verbatim, with no formatting*)
 	END_VAR
 END_FUNCTION
-(*Legacy*)
+(*Legacy: the severity functions below predate logEventID. They remain fully supported*)
 
 {REDUND_CONTEXT} FUNCTION logWarning : DINT (*Write a warning message to the logger*) (*$GROUP=User,$CAT=User,$GROUPICON=User.png,$CATICON=User.png*)
 	VAR_INPUT
