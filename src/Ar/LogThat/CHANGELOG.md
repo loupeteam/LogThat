@@ -1,5 +1,6 @@
 # Change log
 
+- 1.0.1 - Fix logStateChange reporting state 0 in its first entry instead of the state present on the first call
 - 1.0.0 - Raise the minimum StringExt version from 0.14.1 to 1.0.0
     - Update the example project for AS6: remove AsArLog, AsDb, AsSafety, Convert, LoopConR, MTTypes and the Motion libraries, none of which the library uses
     - Update StringExt in the example project to the released 1.0.0
