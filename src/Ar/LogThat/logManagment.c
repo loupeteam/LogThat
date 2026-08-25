@@ -25,8 +25,9 @@ signed long createLogInit(plcstring* name, unsigned long size, enum LOG_PERSISTE
 	if(!name) return LOG_ERR_INVALIDINPUT;
 	if(!size) size = LOG_DEFAULT_LOGGERSIZE;
 	
-	// Max strlen of name can not be greater than 10 chars
-	// We should maybe handle this here
+	// Automation Runtime limits logbook names to 10 chars (module name limit),
+	//  and the name input is declared STRING[LOG_STRLEN_LOGGERNAME] (8).
+	// An over-long name is rejected by ArEventLogCreate, not handled here
 	ArEventLogCreate_typ createLog = {};
 	createLog.Execute = 1;
 	strcpy(createLog.Name, (char*)name);

@@ -1,5 +1,9 @@
 # Change log
 
+- 1.0.0 - Raise the minimum StringExt version from 0.14.1 to 1.0.0
+    - Update the example project for AS6: remove AsArLog, AsDb, AsSafety, Convert, LoopConR, MTTypes and the Motion libraries, none of which the library uses
+    - Update StringExt in the example project to the released 1.0.0
+    - Add package.json so the library can be installed with LPM
 - 0.05.1 - Rename problematic 'delete' internal var to 'deletion' (to avoid C++ keyword conflict in older AS versions)
 - 0.05.0 - Remove constants: LOG_DEFAULT_MESSAGESIZE, LOG_DEFAULT_BUFFEREDENTRIES
     - Remove ManageLoggers Fn
