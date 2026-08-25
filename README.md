@@ -82,7 +82,9 @@ void _INIT ProgramInit(void)
 }
 ```
 
-`createLogInit` calls `ArEventLogCreate` once and returns that call's status rather than polling the function block to completion, and B&R documents `ArEventLogCreate` as asynchronous. Treat an unexpected status here as a prompt to check the status of the first write, which is where a missing logbook shows up unambiguously.
+B&R documents `ArEventLogCreate` as asynchronous, and `createLogInit` calls it once without polling it to completion. In an `_INIT` routine it finishes within that call, so the logbook is usable by the time the next statement runs and the returned status is the final result.
+
+A failed create is otherwise silent: a logbook named `Application` (11 characters, past the Automation Runtime limit) simply never appears, and every later write to it fails.
 
 # Dependencies
 - ArEventLog and AsBrStr, both shipped with Automation Studio
